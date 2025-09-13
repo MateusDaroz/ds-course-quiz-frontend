@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Quiz Game</title>
+    <title>Quiz - Desenvolvimento de Sistemas</title>
     <style>
         * {
             margin: 0;
@@ -13,32 +13,38 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #020403 20%, #212122);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-
-        .container {
-            background: white;
+        
+        .container-border{
             border-radius: 20px;
-            padding: 2rem;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             max-width: 600px;
             width: 90%;
+            padding: .4rem;
+            background: linear-gradient(to right, #663399, #4B0082);
+        }
+
+        .container {
+            background: #26282A;
             text-align: center;
+            border-radius: 20px;
+            padding: 2rem;
         }
 
         h1 {
-            color: #333;
+            color: white;
             margin-bottom: 1.5rem;
             font-size: 2rem;
         }
 
         h2 {
-            color: #555;
-            margin-bottom: 1rem;
+            color: #cbcbcb;
+            margin-bottom: 1.5rem;
         }
 
         input {
@@ -57,7 +63,7 @@
         }
 
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #4B0082 0%, #663399 100%);
             color: white;
             border: none;
             padding: 12px 24px;
@@ -73,13 +79,17 @@
         }
 
         button:disabled {
-            background: #ccc;
+            background: grey;
             cursor: not-allowed;
             transform: none;
         }
 
         .question-container {
             margin: 20px 0;
+        }
+
+        .waiting p{
+            color: grey;
         }
 
         .question {
@@ -132,13 +142,28 @@
         }
 
         .player-item {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #020403 20%, #212122);
             padding: 10px;
             margin: 5px 0;
             border-radius: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .player-header-list{
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #4B0082 0%, #663399 100%);
+            color: white;
+        }
+
+        .player-item span{
+            color: white;
         }
 
         .leaderboard {
@@ -185,7 +210,7 @@
         }
 
         .system-selector {
-            margin-bottom: 2rem;
+            /*margin-bottom: 2rem;*/
         }
 
         .system-selector button {
@@ -198,88 +223,94 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- System Selection -->
-        <div id="systemSelector" class="system-selector">
-            <h1>Quiz Game System</h1>
-            <p>Choose your role:</p>
-            <button onclick="initHost()">Host System</button>
-            <button onclick="initPlayer()">Player System</button>
-        </div>
-
-        <!-- Player System -->
-        <div id="playerSystem" class="hidden">
-            <!-- Player Registration -->
-            <div id="playerRegistration">
-                <h1>Join the Quiz!</h1>
-                <input type="text" id="playerName" placeholder="Enter your name" required>
-                <input type="text" id="playerSchool" placeholder="Enter your school" required>
-                <input type="text" id="playerCity" placeholder="Enter your city" required>
-                <button onclick="joinGame()">Join Waiting Lobby</button>
+    <div class="container-border">
+        <div class="container">
+            <!-- System Selection -->
+            <div id="systemSelector" class="system-selector">
+                <h1>Quiz - Desenvolvimento de Sistemas</h1>
+                <h2>Teste seus conhecimentos sobre o melhor curso do COTIL!</h2>
+                <button onclick="initHost()">Sistema do Organizador</button>
+                <button onclick="initPlayer()">Sistema do Jogador</button>
             </div>
 
-            <!-- Player Waiting -->
-            <div id="playerWaiting" class="hidden">
-                <h1>Waiting for Game to Start...</h1>
-                <div class="waiting">
-                    <p>Please wait while other players join</p>
+            <!-- Player System -->
+            <div id="playerSystem" class="hidden">
+                <!-- Player Registration -->
+                <div id="playerRegistration">
+                    <h1>Entre na sala de espera!</h1>
+                    <input type="text" id="playerName" placeholder="Digite seu nome" required>
+                    <input type="text" id="playerSchool" placeholder="Digite o nome da sua escola" required>
+                    <input type="text" id="playerCity" placeholder="Digite o nome da sua cidade" required>
+                    <button onclick="joinGame()">Entrar na sala de espera</button>
+                </div>
+
+                <!-- Player Waiting -->
+                <div id="playerWaiting" class="hidden">
+                    <h1>Esperando o jogo começar...</h1>
+                    <div class="waiting">
+                        <p>Espere todos os jogadores entrarem!</p>
+                    </div>
+                </div>
+
+                <!-- Player Quiz -->
+                <div id="playerQuiz" class="hidden">
+                    <div class="score" id="playerScore">Pontuação: 0 pontos</div>
+                    <div class="question-container">
+                        <div class="question" id="questionText"></div>
+                        <div class="alternatives" id="alternatives"></div>
+                    </div>
+                    <div>Questão <span id="questionNumber">1</span> de 10</div>
+                </div>
+
+                <!-- Player Waiting for Results -->
+                <div id="playerWaitingResults" class="hidden">
+                    <h1>Você completou o quiz!</h1>
+                    <div class="score" id="finalScore">Sua pontuação final: 0 pontos</div>
+                    <div class="waiting">
+                        <p>Esperando todos os jogadores finalizarem...</p>
+                    </div>
+                </div>
+
+                <!-- Player Final Results -->
+                <div id="playerResults" class="hidden">
+                    <h1>Resultados Finais</h1>
+                    <div class="score" id="playerFinalScore">Sua pontuação: 0 pontos</div>
+                    <div class="score" id="playerPosition">Sua posição: #1</div>
+                    <div class="leaderboard" id="finalLeaderboard"></div>
                 </div>
             </div>
 
-            <!-- Player Quiz -->
-            <div id="playerQuiz" class="hidden">
-                <div class="score" id="playerScore">Score: 0 points</div>
-                <div class="question-container">
-                    <div class="question" id="questionText"></div>
-                    <div class="alternatives" id="alternatives"></div>
+            <!-- Host System -->
+            <div id="hostSystem" class="hidden">
+                <!-- Host Lobby Setup -->
+                <div id="hostLobby">
+                    <h1>Quiz - Área do Organizador</h1>
+                    <button onclick="openLobby()" id="openLobbyBtn">Abrir sala</button>
+                    
+                    <div id="lobbyOpen" class="hidden">
+                        <h2>Jogadores na Sala:</h2>
+                        <div class="player-header-list">
+                            <p>Nome</p>
+                            <p>Escola - Cidade</p>
+                        </div>
+                        <div class="player-list" id="playersList"></div>
+                        <button onclick="startGame()" id="startGameBtn" disabled>Começar o jogo</button>
+                    </div>
                 </div>
-                <div>Question <span id="questionNumber">1</span> of 10</div>
-            </div>
 
-            <!-- Player Waiting for Results -->
-            <div id="playerWaitingResults" class="hidden">
-                <h1>Quiz Completed!</h1>
-                <div class="score" id="finalScore">Your Final Score: 0 points</div>
-                <div class="waiting">
-                    <p>Waiting for other players to finish...</p>
+                <!-- Host Game View -->
+                <div id="hostGame" class="hidden">
+                    <h1>Classificação Geral</h1>
+                    <div class="timer" id="gameTimer">5:00</div>
+                    <div class="leaderboard" id="liveLeaderboard"></div>
                 </div>
-            </div>
 
-            <!-- Player Final Results -->
-            <div id="playerResults" class="hidden">
-                <h1>Final Results</h1>
-                <div class="score" id="playerFinalScore">Your Score: 0 points</div>
-                <div class="score" id="playerPosition">Your Position: #1</div>
-                <div class="leaderboard" id="finalLeaderboard"></div>
-            </div>
-        </div>
-
-        <!-- Host System -->
-        <div id="hostSystem" class="hidden">
-            <!-- Host Lobby Setup -->
-            <div id="hostLobby">
-                <h1>Quiz Host Dashboard</h1>
-                <button onclick="openLobby()" id="openLobbyBtn">Open Lobby</button>
-                
-                <div id="lobbyOpen" class="hidden">
-                    <h2>Players in Lobby:</h2>
-                    <div class="player-list" id="playersList"></div>
-                    <button onclick="startGame()" id="startGameBtn" disabled>Start Game</button>
+                <!-- Host Final Results -->
+                <div id="hostResults" class="hidden">
+                    <h1>Resultados do Quiz - Top 3</h1>
+                    <div class="leaderboard" id="top3Leaderboard"></div>
+                    <button onclick="restartGame()">Reiniciar o jogo</button>
                 </div>
-            </div>
-
-            <!-- Host Game View -->
-            <div id="hostGame" class="hidden">
-                <h1>Live Leaderboard</h1>
-                <div class="timer" id="gameTimer">5:00</div>
-                <div class="leaderboard" id="liveLeaderboard"></div>
-            </div>
-
-            <!-- Host Final Results -->
-            <div id="hostResults" class="hidden">
-                <h1>Game Results - Top 3</h1>
-                <div class="leaderboard" id="top3Leaderboard"></div>
-                <button onclick="restartGame()">Restart Game</button>
             </div>
         </div>
     </div>
@@ -358,7 +389,7 @@
         function connectWebSocket() {
             try {
                 // Replace with your WebSocket server URL
-                ws = new WebSocket('ws://localhost:3001');
+                ws = new WebSocket('https://loving-generosity-production.up.railway.app');
                 
                 ws.onopen = function() {
                     console.log('Connected to WebSocket server');
@@ -488,7 +519,7 @@
             const city = document.getElementById('playerCity').value.trim();
 
             if (!name || !school || !city) {
-                alert('Please fill in all fields!');
+                alert('Por favor, preencha todos os campos!');
                 return;
             }
 
@@ -578,14 +609,14 @@
         }
 
         function updatePlayerScore() {
-            document.getElementById('playerScore').textContent = `Score: ${gameState.currentPlayer.score} points`;
+            document.getElementById('playerScore').textContent = `Pontuação: ${gameState.currentPlayer.score} pontos`;
         }
 
         function finishPlayerQuiz() {
             gameState.currentPlayer.finished = true;
             document.getElementById('playerQuiz').classList.add('hidden');
             document.getElementById('playerWaitingResults').classList.remove('hidden');
-            document.getElementById('finalScore').textContent = `Your Final Score: ${gameState.currentPlayer.score} points`;
+            document.getElementById('finalScore').textContent = `Sua pontuação final: ${gameState.currentPlayer.score} pontos`;
 
             // Notify server that player finished
             sendWebSocketMessage({
@@ -703,7 +734,7 @@
                 playerDiv.className = `leaderboard-item ${index === 0 ? 'top' : ''}`;
                 playerDiv.innerHTML = `
                     <span>#${index + 1} ${player.name}</span>
-                    <span>${player.score} points</span>
+                    <span>${player.score} pontos</span>
                 `;
                 top3Leaderboard.appendChild(playerDiv);
             });
@@ -717,8 +748,8 @@
                 const sortedPlayers = [...gameState.players].sort((a, b) => b.score - a.score);
                 const playerPosition = sortedPlayers.findIndex(p => p.id === gameState.currentPlayer.id) + 1;
                 
-                document.getElementById('playerFinalScore').textContent = `Your Score: ${gameState.currentPlayer.score} points`;
-                document.getElementById('playerPosition').textContent = `Your Position: #${playerPosition}`;
+                document.getElementById('playerFinalScore').textContent = `Sua pontuação: ${gameState.currentPlayer.score} pontos`;
+                document.getElementById('playerPosition').textContent = `Sua posição: #${playerPosition}`;
                 
                 const finalLeaderboard = document.getElementById('finalLeaderboard');
                 finalLeaderboard.innerHTML = '';
@@ -728,7 +759,7 @@
                     playerDiv.className = `leaderboard-item ${player.id === gameState.currentPlayer.id ? 'top' : ''}`;
                     playerDiv.innerHTML = `
                         <span>#${index + 1} ${player.name}</span>
-                        <span>${player.score} points</span>
+                        <span>${player.score} pontos</span>
                     `;
                     finalLeaderboard.appendChild(playerDiv);
                 });
