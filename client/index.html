@@ -4,199 +4,198 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz - Desenvolvimento de Sistemas</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary-purple: #663399;
+            --secondary-purple: #4B0082;
+            --dark-bg: #020403;
+            --dark-card: #26282A;
+            --light-text: #cbcbcb;
+            --gradient-border: linear-gradient(to right, #663399, #4B0082);
+            --gradient-bg: linear-gradient(135deg, #020403 20%, #212122);
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #020403 20%, #212122);
+            background: var(--gradient-bg);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .container-border{
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            max-width: 600px;
-            width: 90%;
-            padding: .4rem;
-            background: linear-gradient(to right, #663399, #4B0082);
-        }
-
-        .container {
-            background: #26282A;
-            text-align: center;
-            border-radius: 20px;
-            padding: 2rem;
-        }
-
-        h1 {
             color: white;
-            margin-bottom: 1.5rem;
-            font-size: 2rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        h2 {
-            color: #cbcbcb;
-            margin-bottom: 1.5rem;
+        h1, h2, h3{
+            color: white !important;
         }
 
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+        h4, h5, h6{
+            color: #cdcdcd !important;
         }
 
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        button {
-            background: linear-gradient(135deg, #4B0082 0%, #663399 100%);
-            color: white;
+        .custom-card {
+            background: var(--dark-card);
             border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 10px;
-            transition: transform 0.2s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        button:hover {
+        .gradient-border {
+            padding: 3px;
+            background: var(--gradient-border);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .gradient-border .card {
+            background: var(--dark-card);
+            border: none;
+            border-radius: 17px;
+        }
+
+        .btn-purple {
+            background: var(--gradient-border);
+            border: none;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-purple:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 51, 153, 0.4);
+            color: white;
         }
 
-        button:disabled {
-            background: grey;
-            cursor: not-allowed;
+        .btn-purple:disabled {
+            background: #6c757d;
             transform: none;
+            box-shadow: none;
         }
 
-        .question-container {
-            margin: 20px 0;
+        .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 10px;
         }
 
-        .waiting p{
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 0.2rem rgba(102, 51, 153, 0.25);
+            color: white;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-floating label, .form-floating>.form-control:focus~label{
             color: grey;
         }
 
-        .question {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            font-size: 18px;
-            font-weight: bold;
+        .form-floating>.form-control-plaintext~label::after, .form-floating>.form-control:focus~label::after, .form-floating>.form-control:not(:placeholder-shown)~label::after, .form-floating>.form-select~label::after{
+            background: none;
         }
 
-        .alternatives {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+
+        .form-floating>.form-control:not(:placeholder-shown)~label{
+            color: white
         }
 
-        .alternative {
-            background: #e9ecef;
+        .question-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .alternative-btn {
+            background-color: #2b2d2f;
             border: 3px solid transparent;
-            border-radius: 8px;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .alternative:hover {
-            background: #dee2e6;
-        }
-
-        .alternative.correct {
-            border-color: #28a745;
-            background: #d4edda;
-        }
-
-        .alternative.wrong {
-            border-color: #dc3545;
-            background: #f8d7da;
-        }
-
-        .alternative.show-correct {
-            border-color: #28a745;
-            background: #d4edda;
-        }
-
-        .player-list {
+            border-radius: 10px;
+            color: white;
+            transition: all 0.3s ease;
             text-align: left;
-            max-height: 300px;
-            overflow-y: auto;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .alternative-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .alternative-btn.correct {
+            border-color: #28a745;
+            color: #28a745;
+        }
+
+        .alternative-btn.wrong {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .alternative-btn.show-correct {
+            border-color: #28a745;
+            color: #28a745;
         }
 
         .player-item {
-            background: linear-gradient(135deg, #020403 20%, #212122);
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: linear-gradient(145deg, #02040250, #21212250) !important;
+            border: 1px solid rgba(102, 51, 153, 0.3);
+            border-radius: 10px;
+            transition: all 0.3s ease;
         }
 
-        .player-header-list{
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(135deg, #4B0082 0%, #663399 100%);
+        .player-item:hover {
+            border-color: var(--primary-purple);
+            box-shadow: 0 5px 15px rgba(102, 51, 153, 0.2);
+        }
+
+        .player-header {
+            background: var(--gradient-border);
+            border-radius: 10px;
             color: white;
-        }
-
-        .player-item span{
-            color: white;
-        }
-
-        .leaderboard {
-            text-align: left;
+            font-weight: 600;
         }
 
         .leaderboard-item {
-            background: #f8f9fa;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef) !important;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 10px;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .leaderboard-item.top {
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            background: linear-gradient(145deg, #ffd700, #ffed4e);
+            border-color: #ffc107;
+            color: #856404;
+            font-weight: bold;
         }
 
         .timer {
-            font-size: 24px;
+            background: linear-gradient(145deg, #dc3545, #c82333);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             font-weight: bold;
-            color: #dc3545;
-            margin: 20px 0;
+            font-size: 2rem;
         }
 
         .score {
-            font-size: 20px;
-            font-weight: bold;
             color: #28a745;
-            margin: 20px 0;
+            font-weight: bold;
+            font-size: 1.25rem;
         }
 
         .waiting {
@@ -209,111 +208,256 @@
             100% { opacity: 1; }
         }
 
-        .system-selector {
-            /*margin-bottom: 2rem;*/
+        .badge-purple {
+            background: var(--gradient-border);
+            color: white;
         }
 
-        .system-selector button {
-            margin: 0 10px;
+        .text-purple {
+            color: var(--primary-purple);
         }
 
-        .hidden {
-            display: none;
+        .progress {
+            background: rgba(255, 255, 255, 0.2);
+            height: 8px;
+        }
+
+        .progress-bar {
+            background: var(--gradient-border);
+        }
+
+        .icon-lg {
+            font-size: 3rem;
+            color: var(--primary-purple);
+        }
+
+        .custom-scrollbar {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: var(--gradient-border);
+            border-radius: 10px;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .alternatives-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .timer {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container-border">
-        <div class="container">
-            <!-- System Selection -->
-            <div id="systemSelector" class="system-selector">
-                <h1>Quiz - Desenvolvimento de Sistemas</h1>
-                <h2>Teste seus conhecimentos sobre o melhor curso do COTIL!</h2>
-                <button onclick="initHost()">Sistema do Organizador</button>
-                <button onclick="initPlayer()">Sistema do Jogador</button>
-            </div>
+    <!--<div class="position-relative">
+        <div class="position-absolute top-50 start-50 translate-middle">-->
+            <div class="container-fluid py-4 d-flex align-items-center justify-content-center min-vh-100">
+                <div class="row justify-content-center w-100">
+                    <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+                        <div class="gradient-border">
+                            <div class="card custom-card">
+                                <div class="card-body p-4 p-md-5">
+                                    
+                                    <!-- System Selection -->
+                                    <div id="systemSelector" class="text-center">
+                                        <div class="mb-4">
+                                            <i class="bi bi-code-slash icon-lg mb-3"></i>
+                                            <h1 class="display-5 fw-bold mb-3">Quiz - Desenvolvimento de Sistemas</h1>
+                                            <h5 class="mb-4">Teste seus conhecimentos sobre o melhor curso do COTIL!</h5>
+                                        </div>
+                                        <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+                                            <button class="btn btn-purple btn-lg px-4" onclick="initHost()">
+                                                <i class="bi bi-person-gear me-2"></i>Sistema do Organizador
+                                            </button>
+                                            <button class="btn btn-purple btn-lg px-4" onclick="initPlayer()">
+                                                <i class="bi bi-person-plus me-2"></i>Sistema do Jogador
+                                            </button>
+                                        </div>
+                                    </div>
 
-            <!-- Player System -->
-            <div id="playerSystem" class="hidden">
-                <!-- Player Registration -->
-                <div id="playerRegistration">
-                    <h1>Entre na sala de espera!</h1>
-                    <input type="text" id="playerName" placeholder="Digite seu nome" required>
-                    <input type="text" id="playerSchool" placeholder="Digite o nome da sua escola" required>
-                    <input type="text" id="playerCity" placeholder="Digite o nome da sua cidade" required>
-                    <button onclick="joinGame()">Entrar na sala de espera</button>
-                </div>
+                                    <!-- Player System -->
+                                    <div id="playerSystem" class="d-none">
+                                        <!-- Player Registration -->
+                                        <div id="playerRegistration">
+                                            <div class="text-center mb-4">
+                                                <i class="bi bi-door-open icon-lg mb-3"></i>
+                                                <h2 class="mb-4">Entre na sala de espera!</h2>
+                                            </div>
+                                            <div class="row g-3">
+                                                <div class="col-12">
+                                                    <div class="form-floating">
+                                                        <input type="text" class="form-control" id="playerName" placeholder="Digite seu nome" required>
+                                                        <label for="playerName"><i class="bi bi-person me-2"></i>Seu nome</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="form-floating">
+                                                        <input type="text" class="form-control" id="playerSchool" placeholder="Digite o nome da sua escola" required>
+                                                        <label for="playerSchool"><i class="bi bi-building me-2"></i>Nome da sua escola</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="form-floating">
+                                                        <input type="text" class="form-control" id="playerCity" placeholder="Digite o nome da sua cidade" required>
+                                                        <label for="playerCity"><i class="bi bi-geo-alt me-2"></i>Nome da sua cidade</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 mt-4">
+                                                    <button class="btn btn-purple w-100 btn-lg" onclick="joinGame()">
+                                                        <i class="bi bi-arrow-right-circle me-2"></i>Entrar na sala de espera
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                <!-- Player Waiting -->
-                <div id="playerWaiting" class="hidden">
-                    <h1>Esperando o jogo começar...</h1>
-                    <div class="waiting">
-                        <p>Espere todos os jogadores entrarem!</p>
-                    </div>
-                </div>
+                                        <!-- Player Waiting -->
+                                        <div id="playerWaiting" class="d-none">
+                                            <div class="text-center waiting">
+                                                <i class="bi bi-hourglass-split icon-lg mb-3"></i>
+                                                <h2 class="mb-4">Esperando o jogo começar...</h2>
+                                                <div class="spinner-border text-light mb-3" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <p>Espere todos os jogadores entrarem!</p>
+                                            </div>
+                                        </div>
 
-                <!-- Player Quiz -->
-                <div id="playerQuiz" class="hidden">
-                    <div class="score" id="playerScore">Pontuação: 0 pontos</div>
-                    <div class="question-container">
-                        <div class="question" id="questionText"></div>
-                        <div class="alternatives" id="alternatives"></div>
-                    </div>
-                    <div>Questão <span id="questionNumber">1</span> de 10</div>
-                </div>
+                                        <!-- Player Quiz -->
+                                        <div id="playerQuiz" class="d-none">
+                                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                                <div class="score" id="playerScore">
+                                                    <i class="bi bi-trophy me-2"></i>Pontuação: 0 pontos
+                                                </div>
+                                                <div class="badge badge-purple fs-6">
+                                                    Questão <span id="questionNumber">1</span> de 10
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="question-container">
+                                                <div class="card question-card mb-4">
+                                                    <div class="card-body">
+                                                        <h5 class="card-text fw-bold" id="questionText"></h5>
+                                                    </div>
+                                                </div>
+                                                <div class="row g-3 alternatives-grid" id="alternatives" style="grid-template-columns: 1fr 1fr;"></div>
+                                            </div>
+                                        </div>
 
-                <!-- Player Waiting for Results -->
-                <div id="playerWaitingResults" class="hidden">
-                    <h1>Você completou o quiz!</h1>
-                    <div class="score" id="finalScore">Sua pontuação final: 0 pontos</div>
-                    <div class="waiting">
-                        <p>Esperando todos os jogadores finalizarem...</p>
-                    </div>
-                </div>
+                                        <!-- Player Waiting for Results -->
+                                        <div id="playerWaitingResults" class="d-none">
+                                            <div class="text-center waiting">
+                                                <i class="bi bi-check-circle icon-lg mb-3 text-success"></i>
+                                                <h2 class="mb-4">Você completou o quiz!</h2>
+                                                <div class="score mb-4" id="finalScore">Sua pontuação final: 0 pontos</div>
+                                                <div class="spinner-border text-light mb-3" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <p>Esperando todos os jogadores finalizarem...</p>
+                                            </div>
+                                        </div>
 
-                <!-- Player Final Results -->
-                <div id="playerResults" class="hidden">
-                    <h1>Resultados Finais</h1>
-                    <div class="score" id="playerFinalScore">Sua pontuação: 0 pontos</div>
-                    <div class="score" id="playerPosition">Sua posição: #1</div>
-                    <div class="leaderboard" id="finalLeaderboard"></div>
-                </div>
-            </div>
+                                        <!-- Player Final Results -->
+                                        <div id="playerResults" class="d-none">
+                                            <div class="text-center mb-4">
+                                                <i class="bi bi-award icon-lg mb-3"></i>
+                                                <h2 class="mb-4">Resultados Finais</h2>
+                                                <div class="score mb-2" id="playerFinalScore">Sua pontuação: 0 pontos</div>
+                                                <div class="score mb-4" id="playerPosition">Sua posição: #1</div>
+                                            </div>
+                                            <div class="custom-scrollbar" id="finalLeaderboard"></div>
+                                        </div>
+                                    </div>
 
-            <!-- Host System -->
-            <div id="hostSystem" class="hidden">
-                <!-- Host Lobby Setup -->
-                <div id="hostLobby">
-                    <h1>Quiz - Área do Organizador</h1>
-                    <button onclick="openLobby()" id="openLobbyBtn">Abrir sala</button>
-                    
-                    <div id="lobbyOpen" class="hidden">
-                        <h2>Jogadores na Sala:</h2>
-                        <div class="player-header-list">
-                            <p>Nome</p>
-                            <p>Escola - Cidade</p>
+                                    <!-- Host System -->
+                                    <div id="hostSystem" class="d-none">
+                                        <!-- Host Lobby Setup -->
+                                        <div id="hostLobby">
+                                            <div class="text-center mb-4">
+                                                <i class="bi bi-gear icon-lg mb-3"></i>
+                                                <h2 class="mb-4">Quiz - Área do Organizador</h2>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button class="btn btn-purple btn-lg mb-4" onclick="openLobby()" id="openLobbyBtn">
+                                                    <i class="bi bi-door-open me-2"></i>Abrir sala
+                                                </button>
+                                            </div>
+                                            
+                                            <div id="lobbyOpen" class="d-none">
+                                                <h4 class="mb-3"><i class="bi bi-people me-2"></i>Jogadores na Sala:</h4>
+                                                <div class="card glass-effect mb-3">
+                                                    <div class="card-body player-header py-2">
+                                                        <div class="row">
+                                                            <div class="col-6">
+                                                                <strong>Nome</strong>
+                                                            </div>
+                                                            <div class="col-6 text-end">
+                                                                <strong>Escola - Cidade</strong>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="custom-scrollbar mb-4" id="playersList"></div>
+                                                <div class="d-grid">
+                                                    <button class="btn btn-purple btn-lg" onclick="startGame()" id="startGameBtn" disabled>
+                                                        <i class="bi bi-play-circle me-2"></i>Começar o jogo
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Host Game View -->
+                                        <div id="hostGame" class="d-none">
+                                            <div class="text-center mb-4">
+                                                <h2 class="mb-3"><i class="bi bi-trophy me-2"></i>Classificação Geral</h2>
+                                                <div class="timer mb-3" id="gameTimer">5:00</div>
+                                            </div>
+                                            <div class="custom-scrollbar" id="liveLeaderboard"></div>
+                                        </div>
+
+                                        <!-- Host Final Results -->
+                                        <div id="hostResults" class="d-none">
+                                            <div class="text-center mb-4">
+                                                <i class="bi bi-trophy-fill icon-lg mb-3 text-warning"></i>
+                                                <h2 class="mb-4">Resultados do Quiz - Top 3</h2>
+                                            </div>
+                                            <div class="mb-4" id="top3Leaderboard"></div>
+                                            <div class="d-grid">
+                                                <button class="btn btn-purple btn-lg" onclick="restartGame()">
+                                                    <i class="bi bi-arrow-clockwise me-2"></i>Reiniciar o jogo
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="player-list" id="playersList"></div>
-                        <button onclick="startGame()" id="startGameBtn" disabled>Começar o jogo</button>
                     </div>
                 </div>
-
-                <!-- Host Game View -->
-                <div id="hostGame" class="hidden">
-                    <h1>Classificação Geral</h1>
-                    <div class="timer" id="gameTimer">5:00</div>
-                    <div class="leaderboard" id="liveLeaderboard"></div>
-                </div>
-
-                <!-- Host Final Results -->
-                <div id="hostResults" class="hidden">
-                    <h1>Resultados do Quiz - Top 3</h1>
-                    <div class="leaderboard" id="top3Leaderboard"></div>
-                    <button onclick="restartGame()">Reiniciar o jogo</button>
-                </div>
             </div>
-        </div>
-    </div>
+        <!--</div>
+    </div>-->
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 
     <script>
         // WebSocket Connection
@@ -497,8 +641,8 @@
         // System Initialization
         function initHost() {
             gameState.isHost = true;
-            document.getElementById('systemSelector').classList.add('hidden');
-            document.getElementById('hostSystem').classList.remove('hidden');
+            document.getElementById('systemSelector').classList.add('d-none');
+            document.getElementById('hostSystem').classList.remove('d-none');
             
             // Request room creation from server
             sendWebSocketMessage({
@@ -508,8 +652,8 @@
 
         function initPlayer() {
             gameState.isHost = false;
-            document.getElementById('systemSelector').classList.add('hidden');
-            document.getElementById('playerSystem').classList.remove('hidden');
+            document.getElementById('systemSelector').classList.add('d-none');
+            document.getElementById('playerSystem').classList.remove('d-none');
         }
 
         // Player Functions
@@ -540,13 +684,13 @@
                 roomCode: gameState.roomCode
             });
 
-            document.getElementById('playerRegistration').classList.add('hidden');
-            document.getElementById('playerWaiting').classList.remove('hidden');
+            document.getElementById('playerRegistration').classList.add('d-none');
+            document.getElementById('playerWaiting').classList.remove('d-none');
         }
 
         function startPlayerQuiz() {
-            document.getElementById('playerWaiting').classList.add('hidden');
-            document.getElementById('playerQuiz').classList.remove('hidden');
+            document.getElementById('playerWaiting').classList.add('d-none');
+            document.getElementById('playerQuiz').classList.remove('d-none');
             showQuestion();
         }
 
@@ -564,17 +708,22 @@
             alternativesContainer.innerHTML = '';
 
             question.alternatives.forEach((alt, index) => {
-                const altDiv = document.createElement('div');
-                altDiv.className = 'alternative';
-                altDiv.textContent = alt;
-                altDiv.onclick = () => selectAnswer(index);
-                alternativesContainer.appendChild(altDiv);
+                const colDiv = document.createElement('div');
+                colDiv.className = 'col-12 col-md-6';
+                
+                const altBtn = document.createElement('button');
+                altBtn.className = 'btn alternative-btn w-100 h-100';
+                altBtn.textContent = alt;
+                altBtn.onclick = () => selectAnswer(index);
+                
+                colDiv.appendChild(altBtn);
+                alternativesContainer.appendChild(colDiv);
             });
         }
 
         function selectAnswer(selectedIndex) {
             const question = gameState.questions[gameState.currentQuestion];
-            const alternatives = document.querySelectorAll('.alternative');
+            const alternatives = document.querySelectorAll('.alternative-btn');
             
             // Disable all alternatives
             alternatives.forEach(alt => alt.onclick = null);
@@ -609,13 +758,13 @@
         }
 
         function updatePlayerScore() {
-            document.getElementById('playerScore').textContent = `Pontuação: ${gameState.currentPlayer.score} pontos`;
+            document.getElementById('playerScore').innerHTML = `<i class="bi bi-trophy me-2"></i>Pontuação: ${gameState.currentPlayer.score} pontos`;
         }
 
         function finishPlayerQuiz() {
             gameState.currentPlayer.finished = true;
-            document.getElementById('playerQuiz').classList.add('hidden');
-            document.getElementById('playerWaitingResults').classList.remove('hidden');
+            document.getElementById('playerQuiz').classList.add('d-none');
+            document.getElementById('playerWaitingResults').classList.remove('d-none');
             document.getElementById('finalScore').textContent = `Sua pontuação final: ${gameState.currentPlayer.score} pontos`;
 
             // Notify server that player finished
@@ -628,8 +777,8 @@
 
         // Host Functions
         function openLobby() {
-            document.getElementById('openLobbyBtn').classList.add('hidden');
-            document.getElementById('lobbyOpen').classList.remove('hidden');
+            document.getElementById('openLobbyBtn').classList.add('d-none');
+            document.getElementById('lobbyOpen').classList.remove('d-none');
             updateHostPlayersList();
         }
 
@@ -638,10 +787,21 @@
             playersList.innerHTML = '';
 
             gameState.players.forEach(player => {
-                const playerDiv = document.createElement('div');
-                playerDiv.className = 'player-item';
-                playerDiv.innerHTML = `<span>${player.name}</span><span>${player.school} - ${player.city}</span>`;
-                playersList.appendChild(playerDiv);
+                const playerCard = document.createElement('div');
+                playerCard.className = 'card player-item mb-2';
+                playerCard.innerHTML = `
+                    <div class="card-body py-2">
+                        <div class="row align-items-center">
+                            <div class="col-6">
+                                <span class="text-white">${player.name}</span>
+                            </div>
+                            <div class="col-6 text-end">
+                                <span class="text-white">${player.school} - ${player.city}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                playersList.appendChild(playerCard);
             });
 
             const startBtn = document.getElementById('startGameBtn');
@@ -650,8 +810,8 @@
 
         function startGame() {
             gameState.gameStarted = true;
-            document.getElementById('hostLobby').classList.add('hidden');
-            document.getElementById('hostGame').classList.remove('hidden');
+            document.getElementById('hostLobby').classList.add('d-none');
+            document.getElementById('hostGame').classList.remove('d-none');
 
             // Send start game message to server
             sendWebSocketMessage({
@@ -674,13 +834,25 @@
             
             leaderboard.innerHTML = '';
             sortedPlayers.forEach((player, index) => {
-                const playerDiv = document.createElement('div');
-                playerDiv.className = 'leaderboard-item';
-                playerDiv.innerHTML = `
-                    <span>#${index + 1} ${player.name}</span>
-                    <span>${player.score} points</span>
+                const playerCard = document.createElement('div');
+                playerCard.className = 'card leaderboard-item mb-3';
+                playerCard.innerHTML = `
+                    <div class="card-body py-3">
+                        <div class="row align-items-center">
+                            <div class="col-1">
+                                <span class="badge bg-secondary fs-6">#${index + 1}</span>
+                            </div>
+                            <div class="col-7">
+                                <strong>${player.name}</strong>
+                                <br><small>${player.school}</small>
+                            </div>
+                            <div class="col-4 text-end">
+                                <span class="badge badge-purple fs-6">${player.score} pontos</span>
+                            </div>
+                        </div>
+                    </div>
                 `;
-                leaderboard.appendChild(playerDiv);
+                leaderboard.appendChild(playerCard);
             });
         }
 
@@ -710,7 +882,7 @@
             gameState.gameEnded = true;
             
             // Show host results
-            if (gameState.isHost || document.getElementById('hostGame').classList.contains('hidden') === false) {
+            if (gameState.isHost || !document.getElementById('hostGame').classList.contains('d-none')) {
                 showHostResults();
             }
             
@@ -719,8 +891,8 @@
         }
 
         function showHostResults() {
-            document.getElementById('hostGame').classList.add('hidden');
-            document.getElementById('hostResults').classList.remove('hidden');
+            document.getElementById('hostGame').classList.add('d-none');
+            document.getElementById('hostResults').classList.remove('d-none');
             
             const top3Players = [...gameState.players]
                 .sort((a, b) => b.score - a.score)
@@ -730,20 +902,34 @@
             top3Leaderboard.innerHTML = '';
             
             top3Players.forEach((player, index) => {
-                const playerDiv = document.createElement('div');
-                playerDiv.className = `leaderboard-item ${index === 0 ? 'top' : ''}`;
-                playerDiv.innerHTML = `
-                    <span>#${index + 1} ${player.name}</span>
-                    <span>${player.score} pontos</span>
+                const playerCard = document.createElement('div');
+                playerCard.className = `card leaderboard-item mb-3 ${index === 0 ? 'top' : ''}`;
+                playerCard.innerHTML = `
+                    <div class="card-body py-3">
+                        <div class="row align-items-center">
+                            <div class="col-2">
+                                ${index === 0 ? '<i class="bi bi-trophy-fill text-warning fs-3"></i>' : 
+                                  index === 1 ? '<i class="bi bi-award-fill text-secondary fs-3"></i>' : 
+                                  '<i class="bi bi-award text-warning fs-3"></i>'}
+                            </div>
+                            <div class="col-6">
+                                <strong>#${index + 1} ${player.name}</strong>
+                                <br><small>${player.school}</small>
+                            </div>
+                            <div class="col-4 text-end">
+                                <span class="badge badge-purple fs-5">${player.score} pontos</span>
+                            </div>
+                        </div>
+                    </div>
                 `;
-                top3Leaderboard.appendChild(playerDiv);
+                top3Leaderboard.appendChild(playerCard);
             });
         }
 
         function showPlayerResults() {
             if (gameState.currentPlayer) {
-                document.getElementById('playerWaitingResults').classList.add('hidden');
-                document.getElementById('playerResults').classList.remove('hidden');
+                document.getElementById('playerWaitingResults').classList.add('d-none');
+                document.getElementById('playerResults').classList.remove('d-none');
                 
                 const sortedPlayers = [...gameState.players].sort((a, b) => b.score - a.score);
                 const playerPosition = sortedPlayers.findIndex(p => p.id === gameState.currentPlayer.id) + 1;
@@ -755,13 +941,25 @@
                 finalLeaderboard.innerHTML = '';
                 
                 sortedPlayers.forEach((player, index) => {
-                    const playerDiv = document.createElement('div');
-                    playerDiv.className = `leaderboard-item ${player.id === gameState.currentPlayer.id ? 'top' : ''}`;
-                    playerDiv.innerHTML = `
-                        <span>#${index + 1} ${player.name}</span>
-                        <span>${player.score} pontos</span>
+                    const playerCard = document.createElement('div');
+                    playerCard.className = `card leaderboard-item mb-2 ${player.id === gameState.currentPlayer.id ? 'top' : ''}`;
+                    playerCard.innerHTML = `
+                        <div class="card-body py-2">
+                            <div class="row align-items-center">
+                                <div class="col-2">
+                                    <span class="badge bg-secondary">#${index + 1}</span>
+                                </div>
+                                <div class="col-6">
+                                    <strong>${player.name}</strong>
+                                    ${player.id === gameState.currentPlayer.id ? '<i class="bi bi-person-fill text-warning ms-1"></i>' : ''}
+                                </div>
+                                <div class="col-4 text-end">
+                                    <span class="badge badge-purple">${player.score} pontos</span>
+                                </div>
+                            </div>
+                        </div>
                     `;
-                    finalLeaderboard.appendChild(playerDiv);
+                    finalLeaderboard.appendChild(playerCard);
                 });
             }
         }
@@ -781,14 +979,14 @@
             gameState.gameTimer = 300;
             
             // Reset UI
-            document.getElementById('hostResults').classList.add('hidden');
-            document.getElementById('hostLobby').classList.remove('hidden');
-            document.getElementById('openLobbyBtn').classList.remove('hidden');
-            document.getElementById('lobbyOpen').classList.add('hidden');
+            document.getElementById('hostResults').classList.add('d-none');
+            document.getElementById('hostLobby').classList.remove('d-none');
+            document.getElementById('openLobbyBtn').classList.remove('d-none');
+            document.getElementById('lobbyOpen').classList.add('d-none');
             
             // Reset player UI
-            document.getElementById('playerResults').classList.add('hidden');
-            document.getElementById('playerRegistration').classList.remove('hidden');
+            document.getElementById('playerResults').classList.add('d-none');
+            document.getElementById('playerRegistration').classList.remove('d-none');
             document.getElementById('playerName').value = '';
             document.getElementById('playerSchool').value = '';
             document.getElementById('playerCity').value = '';
@@ -799,20 +997,24 @@
             console.log('Room code:', gameState.roomCode);
         }
 
-        // Fallback functions for offline mode
-        function endGame() {
-            gameState.gameEnded = true;
+        // Initialize WebSocket connection and set up responsive behavior
+        window.addEventListener('load', function() {
+            connectWebSocket();
             
-            // Show host results
-            if (gameState.isHost) {
-                showHostResults();
+            // Add responsive grid behavior for alternatives
+            function updateAlternativesGrid() {
+                const alternatives = document.getElementById('alternatives');
+                if (alternatives && window.innerWidth < 768) {
+                    alternatives.style.gridTemplateColumns = '1fr';
+                } else if (alternatives) {
+                    alternatives.style.gridTemplateColumns = '1fr 1fr';
+                }
             }
             
-            // Show player results
-            showPlayerResults();
-        }
-
-        // Remove demo players function as it's not needed with WebSocket
+            // Update on resize
+            window.addEventListener('resize', updateAlternativesGrid);
+            updateAlternativesGrid();
+        });
     </script>
 </body>
 </html>
