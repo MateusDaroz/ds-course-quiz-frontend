@@ -27,7 +27,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        h1, h2, h3{
+        h1, h2, h3, p{
             color: white !important;
         }
 
@@ -100,7 +100,6 @@
             background: none;
         }
 
-
         .form-floating>.form-control:not(:placeholder-shown)~label{
             color: white
         }
@@ -124,7 +123,12 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
+        .btn:first-child:active{
+            color: white;
+        }
+    
         .alternative-btn:hover {
+            color: white;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
@@ -164,7 +168,8 @@
         }
 
         .leaderboard-item {
-            background: linear-gradient(145deg, #f8f9fa, #e9ecef) !important;
+            color: white !important;
+            background: #2b2d2f;
             border: 1px solid rgba(0,0,0,0.1);
             border-radius: 10px;
             color: #333;
@@ -179,7 +184,7 @@
         .leaderboard-item.top {
             background: linear-gradient(145deg, #ffd700, #ffed4e);
             border-color: #ffc107;
-            color: #856404;
+            color: #856404 !important;
             font-weight: bold;
         }
 
@@ -256,6 +261,14 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            font-size: 0.8rem;
+        }
+
         @media (max-width: 768px) {
             .alternatives-grid {
                 grid-template-columns: 1fr !important;
@@ -268,184 +281,188 @@
     </style>
 </head>
 <body>
-    <!--<div class="position-relative">
-        <div class="position-absolute top-50 start-50 translate-middle">-->
-            <div class="container-fluid py-4 d-flex align-items-center justify-content-center min-vh-100">
-                <div class="row justify-content-center w-100">
-                    <div class="col-12 col-md-10 col-lg-8 col-xl-6">
-                        <div class="gradient-border">
-                            <div class="card custom-card">
-                                <div class="card-body p-4 p-md-5">
+    <!-- Connection Status Indicator -->
+    <div class="connection-status">
+        <span id="connectionStatus" class="badge bg-secondary">Connecting...</span>
+    </div>
+
+    <div class="container-fluid py-4 d-flex align-items-center justify-content-center min-vh-100">
+        <div class="row justify-content-center w-100">
+            <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+                <div class="gradient-border">
+                    <div class="card custom-card">
+                        <div class="card-body p-4 p-md-5">
+                            
+                            <!-- System Selection -->
+                            <div id="systemSelector" class="text-center">
+                                <div class="mb-4">
+                                    <i class="bi bi-code-slash icon-lg mb-3"></i>
+                                    <h1 class="display-5 fw-bold mb-3">Quiz - Desenvolvimento de Sistemas</h1>
+                                    <h5 class="mb-4">Teste seus conhecimentos sobre o melhor curso do COTIL!</h5>
+                                </div>
+                                <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+                                    <button class="btn btn-purple btn-lg px-4" onclick="initHost()">
+                                        <i class="bi bi-person-gear me-2"></i>Sistema do Organizador
+                                    </button>
+                                    <button class="btn btn-purple btn-lg px-4" onclick="initPlayer()">
+                                        <i class="bi bi-person-plus me-2"></i>Sistema do Jogador
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Player System -->
+                            <div id="playerSystem" class="d-none">
+                                <!-- Player Registration -->
+                                <div id="playerRegistration">
+                                    <div class="text-center mb-4">
+                                        <i class="bi bi-door-open icon-lg mb-3"></i>
+                                        <h2 class="mb-4">Entre na sala de espera!</h2>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" id="playerName" placeholder="Digite seu nome" required>
+                                                <label for="playerName"><i class="bi bi-person me-2"></i>Seu nome</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" id="playerSchool" placeholder="Digite o nome da sua escola" required>
+                                                <label for="playerSchool"><i class="bi bi-building me-2"></i>Nome da sua escola</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" id="playerCity" placeholder="Digite o nome da sua cidade" required>
+                                                <label for="playerCity"><i class="bi bi-geo-alt me-2"></i>Nome da sua cidade</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mt-4">
+                                            <button class="btn btn-purple w-100 btn-lg" onclick="joinGame()">
+                                                <i class="bi bi-arrow-right-circle me-2"></i>Entrar na sala de espera
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Player Waiting -->
+                                <div id="playerWaiting" class="d-none">
+                                    <div class="text-center waiting">
+                                        <i class="bi bi-hourglass-split icon-lg mb-3"></i>
+                                        <h2 class="mb-4">Esperando o jogo começar...</h2>
+                                        <div class="spinner-border text-light mb-3" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p>Espere todos os jogadores entrarem!</p>
+                                    </div>
+                                </div>
+
+                                <!-- Player Quiz -->
+                                <div id="playerQuiz" class="d-none">
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <div class="score" id="playerScore">
+                                            <i class="bi bi-trophy me-2"></i>Pontuação: 0 pontos
+                                        </div>
+                                        <div class="badge badge-purple fs-6">
+                                            Questão <span id="questionNumber">1</span> de 10
+                                        </div>
+                                    </div>
                                     
-                                    <!-- System Selection -->
-                                    <div id="systemSelector" class="text-center">
-                                        <div class="mb-4">
-                                            <i class="bi bi-code-slash icon-lg mb-3"></i>
-                                            <h1 class="display-5 fw-bold mb-3">Quiz - Desenvolvimento de Sistemas</h1>
-                                            <h5 class="mb-4">Teste seus conhecimentos sobre o melhor curso do COTIL!</h5>
+                                    <div class="question-container">
+                                        <div class="card question-card mb-4">
+                                            <div class="card-body">
+                                                <h5 class="card-text fw-bold" id="questionText"></h5>
+                                            </div>
                                         </div>
-                                        <div class="d-grid gap-3 d-md-flex justify-content-md-center">
-                                            <button class="btn btn-purple btn-lg px-4" onclick="initHost()">
-                                                <i class="bi bi-person-gear me-2"></i>Sistema do Organizador
-                                            </button>
-                                            <button class="btn btn-purple btn-lg px-4" onclick="initPlayer()">
-                                                <i class="bi bi-person-plus me-2"></i>Sistema do Jogador
+                                        <div class="row g-3 alternatives-grid" id="alternatives" style="grid-template-columns: 1fr 1fr;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Player Waiting for Results -->
+                                <div id="playerWaitingResults" class="d-none">
+                                    <div class="text-center waiting">
+                                        <i class="bi bi-check-circle icon-lg mb-3 text-success"></i>
+                                        <h2 class="mb-4">Você completou o quiz!</h2>
+                                        <div class="score mb-4" id="finalScore">Sua pontuação final: 0 pontos</div>
+                                        <div class="spinner-border text-light mb-3" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p>Esperando todos os jogadores finalizarem...</p>
+                                    </div>
+                                </div>
+
+                                <!-- Player Final Results -->
+                                <div id="playerResults" class="d-none">
+                                    <div class="text-center mb-4">
+                                        <i class="bi bi-award icon-lg mb-3"></i>
+                                        <h2 class="mb-4">Resultados Finais</h2>
+                                        <div class="score mb-2" id="playerFinalScore">Sua pontuação: 0 pontos</div>
+                                        <div class="score mb-4" id="playerPosition">Sua posição: #1</div>
+                                    </div>
+                                    <div class="custom-scrollbar" id="finalLeaderboard"></div>
+                                </div>
+                            </div>
+
+                            <!-- Host System -->
+                            <div id="hostSystem" class="d-none">
+                                <!-- Host Lobby Setup -->
+                                <div id="hostLobby">
+                                    <div class="text-center mb-4">
+                                        <i class="bi bi-gear icon-lg mb-3"></i>
+                                        <h2 class="mb-4">Quiz - Área do Organizador</h2>
+                                        <div id="roomCodeDisplay" class="d-none">
+                                            <p>Código da Sala: <span id="roomCode" class="text-white fw-bold"></span></p>
+                                        </div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button class="btn btn-purple btn-lg mb-4" onclick="openLobby()" id="openLobbyBtn">
+                                            <i class="bi bi-door-open me-2"></i>Abrir sala
+                                        </button>
+                                    </div>
+                                    
+                                    <div id="lobbyOpen" class="d-none">
+                                        <h4 class="mb-3"><i class="bi bi-people me-2"></i>Jogadores na Sala: <span id="playerCount">0</span></h4>
+                                        <div class="card glass-effect mb-3">
+                                            <div class="card-body player-header py-2">
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <strong>Nome</strong>
+                                                    </div>
+                                                    <div class="col-6 text-end">
+                                                        <strong>Escola - Cidade</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="custom-scrollbar mb-4" id="playersList"></div>
+                                        <div class="d-grid">
+                                            <button class="btn btn-purple btn-lg" onclick="startGame()" id="startGameBtn" disabled>
+                                                <i class="bi bi-play-circle me-2"></i>Começar o jogo
                                             </button>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <!-- Player System -->
-                                    <div id="playerSystem" class="d-none">
-                                        <!-- Player Registration -->
-                                        <div id="playerRegistration">
-                                            <div class="text-center mb-4">
-                                                <i class="bi bi-door-open icon-lg mb-3"></i>
-                                                <h2 class="mb-4">Entre na sala de espera!</h2>
-                                            </div>
-                                            <div class="row g-3">
-                                                <div class="col-12">
-                                                    <div class="form-floating">
-                                                        <input type="text" class="form-control" id="playerName" placeholder="Digite seu nome" required>
-                                                        <label for="playerName"><i class="bi bi-person me-2"></i>Seu nome</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-12">
-                                                    <div class="form-floating">
-                                                        <input type="text" class="form-control" id="playerSchool" placeholder="Digite o nome da sua escola" required>
-                                                        <label for="playerSchool"><i class="bi bi-building me-2"></i>Nome da sua escola</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-12">
-                                                    <div class="form-floating">
-                                                        <input type="text" class="form-control" id="playerCity" placeholder="Digite o nome da sua cidade" required>
-                                                        <label for="playerCity"><i class="bi bi-geo-alt me-2"></i>Nome da sua cidade</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-12 mt-4">
-                                                    <button class="btn btn-purple w-100 btn-lg" onclick="joinGame()">
-                                                        <i class="bi bi-arrow-right-circle me-2"></i>Entrar na sala de espera
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Player Waiting -->
-                                        <div id="playerWaiting" class="d-none">
-                                            <div class="text-center waiting">
-                                                <i class="bi bi-hourglass-split icon-lg mb-3"></i>
-                                                <h2 class="mb-4">Esperando o jogo começar...</h2>
-                                                <div class="spinner-border text-light mb-3" role="status">
-                                                    <span class="visually-hidden">Loading...</span>
-                                                </div>
-                                                <p>Espere todos os jogadores entrarem!</p>
-                                            </div>
-                                        </div>
-
-                                        <!-- Player Quiz -->
-                                        <div id="playerQuiz" class="d-none">
-                                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                                <div class="score" id="playerScore">
-                                                    <i class="bi bi-trophy me-2"></i>Pontuação: 0 pontos
-                                                </div>
-                                                <div class="badge badge-purple fs-6">
-                                                    Questão <span id="questionNumber">1</span> de 10
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="question-container">
-                                                <div class="card question-card mb-4">
-                                                    <div class="card-body">
-                                                        <h5 class="card-text fw-bold" id="questionText"></h5>
-                                                    </div>
-                                                </div>
-                                                <div class="row g-3 alternatives-grid" id="alternatives" style="grid-template-columns: 1fr 1fr;"></div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Player Waiting for Results -->
-                                        <div id="playerWaitingResults" class="d-none">
-                                            <div class="text-center waiting">
-                                                <i class="bi bi-check-circle icon-lg mb-3 text-success"></i>
-                                                <h2 class="mb-4">Você completou o quiz!</h2>
-                                                <div class="score mb-4" id="finalScore">Sua pontuação final: 0 pontos</div>
-                                                <div class="spinner-border text-light mb-3" role="status">
-                                                    <span class="visually-hidden">Loading...</span>
-                                                </div>
-                                                <p>Esperando todos os jogadores finalizarem...</p>
-                                            </div>
-                                        </div>
-
-                                        <!-- Player Final Results -->
-                                        <div id="playerResults" class="d-none">
-                                            <div class="text-center mb-4">
-                                                <i class="bi bi-award icon-lg mb-3"></i>
-                                                <h2 class="mb-4">Resultados Finais</h2>
-                                                <div class="score mb-2" id="playerFinalScore">Sua pontuação: 0 pontos</div>
-                                                <div class="score mb-4" id="playerPosition">Sua posição: #1</div>
-                                            </div>
-                                            <div class="custom-scrollbar" id="finalLeaderboard"></div>
-                                        </div>
+                                <!-- Host Game View -->
+                                <div id="hostGame" class="d-none">
+                                    <div class="text-center mb-4">
+                                        <h2 class="mb-3"><i class="bi bi-trophy me-2"></i>Classificação Geral</h2>
+                                        <div class="timer mb-3" id="gameTimer">5:00</div>
                                     </div>
+                                    <div class="custom-scrollbar" id="liveLeaderboard"></div>
+                                </div>
 
-                                    <!-- Host System -->
-                                    <div id="hostSystem" class="d-none">
-                                        <!-- Host Lobby Setup -->
-                                        <div id="hostLobby">
-                                            <div class="text-center mb-4">
-                                                <i class="bi bi-gear icon-lg mb-3"></i>
-                                                <h2 class="mb-4">Quiz - Área do Organizador</h2>
-                                            </div>
-                                            <div class="d-grid">
-                                                <button class="btn btn-purple btn-lg mb-4" onclick="openLobby()" id="openLobbyBtn">
-                                                    <i class="bi bi-door-open me-2"></i>Abrir sala
-                                                </button>
-                                            </div>
-                                            
-                                            <div id="lobbyOpen" class="d-none">
-                                                <h4 class="mb-3"><i class="bi bi-people me-2"></i>Jogadores na Sala:</h4>
-                                                <div class="card glass-effect mb-3">
-                                                    <div class="card-body player-header py-2">
-                                                        <div class="row">
-                                                            <div class="col-6">
-                                                                <strong>Nome</strong>
-                                                            </div>
-                                                            <div class="col-6 text-end">
-                                                                <strong>Escola - Cidade</strong>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="custom-scrollbar mb-4" id="playersList"></div>
-                                                <div class="d-grid">
-                                                    <button class="btn btn-purple btn-lg" onclick="startGame()" id="startGameBtn" disabled>
-                                                        <i class="bi bi-play-circle me-2"></i>Começar o jogo
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Host Game View -->
-                                        <div id="hostGame" class="d-none">
-                                            <div class="text-center mb-4">
-                                                <h2 class="mb-3"><i class="bi bi-trophy me-2"></i>Classificação Geral</h2>
-                                                <div class="timer mb-3" id="gameTimer">5:00</div>
-                                            </div>
-                                            <div class="custom-scrollbar" id="liveLeaderboard"></div>
-                                        </div>
-
-                                        <!-- Host Final Results -->
-                                        <div id="hostResults" class="d-none">
-                                            <div class="text-center mb-4">
-                                                <i class="bi bi-trophy-fill icon-lg mb-3 text-warning"></i>
-                                                <h2 class="mb-4">Resultados do Quiz - Top 3</h2>
-                                            </div>
-                                            <div class="mb-4" id="top3Leaderboard"></div>
-                                            <div class="d-grid">
-                                                <button class="btn btn-purple btn-lg" onclick="restartGame()">
-                                                    <i class="bi bi-arrow-clockwise me-2"></i>Reiniciar o jogo
-                                                </button>
-                                            </div>
-                                        </div>
+                                <!-- Host Final Results -->
+                                <div id="hostResults" class="d-none">
+                                    <div class="text-center mb-4">
+                                        <i class="bi bi-trophy-fill icon-lg mb-3 text-warning"></i>
+                                        <h2 class="mb-4">Resultados do Quiz - Top 3</h2>
+                                    </div>
+                                    <div class="mb-4" id="top3Leaderboard"></div>
+                                    <div class="d-grid">
+                                        <button class="btn btn-purple btn-lg" onclick="restartGame()">
+                                            <i class="bi bi-arrow-clockwise me-2"></i>Reiniciar o jogo
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -453,8 +470,8 @@
                     </div>
                 </div>
             </div>
-        <!--</div>
-    </div>-->
+        </div>
+    </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
@@ -464,6 +481,7 @@
         let ws = null;
         let reconnectAttempts = 0;
         const maxReconnectAttempts = 5;
+        let isLocalMode = false;
 
         // Game State
         let gameState = {
@@ -533,12 +551,13 @@
         function connectWebSocket() {
             try {
                 // Replace with your WebSocket server URL
-                ws = new WebSocket('https://loving-generosity-production.up.railway.app');
+                ws = new WebSocket('wss://loving-generosity-production.up.railway.app');
                 
                 ws.onopen = function() {
                     console.log('Connected to WebSocket server');
                     reconnectAttempts = 0;
-                    updateConnectionStatus('Connected');
+                    isLocalMode = false;
+                    updateConnectionStatus('Connected', 'success');
                 };
 
                 ws.onmessage = function(event) {
@@ -548,44 +567,75 @@
 
                 ws.onclose = function() {
                     console.log('Disconnected from WebSocket server');
-                    updateConnectionStatus('Disconnected - Attempting to reconnect...');
+                    updateConnectionStatus('Disconnected', 'warning');
                     attemptReconnect();
                 };
 
                 ws.onerror = function(error) {
                     console.error('WebSocket error:', error);
-                    updateConnectionStatus('Connection Error');
+                    updateConnectionStatus('Connection Error', 'danger');
                 };
             } catch (error) {
                 console.error('Failed to connect to WebSocket:', error);
-                updateConnectionStatus('Failed to Connect - Using Local Mode');
-                // Fall back to local mode
+                enableLocalMode();
             }
         }
 
         function attemptReconnect() {
             if (reconnectAttempts < maxReconnectAttempts) {
                 reconnectAttempts++;
+                updateConnectionStatus(`Reconnecting... (${reconnectAttempts}/${maxReconnectAttempts})`, 'warning');
                 setTimeout(() => {
                     console.log(`Reconnection attempt ${reconnectAttempts}`);
                     connectWebSocket();
                 }, 2000 * reconnectAttempts);
             } else {
-                updateConnectionStatus('Connection Failed - Using Local Mode');
+                enableLocalMode();
             }
         }
 
-        function updateConnectionStatus(status) {
-            // You can add a status indicator to the UI if needed
-            console.log('Connection status:', status);
+        function enableLocalMode() {
+            isLocalMode = true;
+            updateConnectionStatus('Local Mode', 'secondary');
+            console.log('Running in local mode - WebSocket features disabled');
+        }
+
+        function updateConnectionStatus(status, type = 'secondary') {
+            const statusElement = document.getElementById('connectionStatus');
+            statusElement.textContent = status;
+            statusElement.className = `badge bg-${type}`;
         }
 
         function sendWebSocketMessage(message) {
-            if (ws && ws.readyState === WebSocket.OPEN) {
+            if (ws && ws.readyState === WebSocket.OPEN && !isLocalMode) {
                 ws.send(JSON.stringify(message));
+                return true;
             } else {
                 console.warn('WebSocket not connected, message not sent:', message);
-                // Handle offline mode or queue messages
+                // Handle local mode operations
+                handleLocalModeMessage(message);
+                return false;
+            }
+        }
+
+        function handleLocalModeMessage(message) {
+            // Simulate server responses for local testing
+            switch (message.type) {
+                case 'create_room':
+                    gameState.roomCode = 'LOCAL-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+                    updateRoomCode();
+                    break;
+                
+                case 'join_game':
+                    // Add player to local list
+                    const existingPlayerIndex = gameState.players.findIndex(p => p.id === message.player.id);
+                    if (existingPlayerIndex === -1) {
+                        gameState.players.push(message.player);
+                        if (gameState.isHost) {
+                            updateHostPlayersList();
+                        }
+                    }
+                    break;
             }
         }
 
@@ -598,7 +648,14 @@
                 
                 case 'player_joined':
                     if (gameState.isHost) {
-                        gameState.players = message.players;
+                        gameState.players = message.players || [];
+                        updateHostPlayersList();
+                    }
+                    break;
+                
+                case 'players_list_update':
+                    if (gameState.isHost) {
+                        gameState.players = message.players || [];
                         updateHostPlayersList();
                     }
                     break;
@@ -611,7 +668,7 @@
                 
                 case 'leaderboard_update':
                     if (gameState.isHost) {
-                        gameState.players = message.players;
+                        gameState.players = message.players || [];
                         updateHostLeaderboard();
                     }
                     break;
@@ -633,14 +690,12 @@
             }
         }
 
-        // Initialize WebSocket connection on page load
-        window.addEventListener('load', function() {
-            connectWebSocket();
-        });
-
         // System Initialization
         function initHost() {
             gameState.isHost = true;
+            // Initialize empty players array
+            gameState.players = [];
+            
             document.getElementById('systemSelector').classList.add('d-none');
             document.getElementById('hostSystem').classList.remove('d-none');
             
@@ -668,7 +723,7 @@
             }
 
             gameState.currentPlayer = {
-                id: Date.now(),
+                id: Date.now() + Math.random(), // Ensure unique ID
                 name: name,
                 school: school,
                 city: city,
@@ -678,11 +733,19 @@
             };
 
             // Send join request to server
-            sendWebSocketMessage({
+            const messageSent = sendWebSocketMessage({
                 type: 'join_game',
                 player: gameState.currentPlayer,
                 roomCode: gameState.roomCode
             });
+
+            // If in local mode, add player directly
+            if (isLocalMode || !messageSent) {
+                const existingPlayerIndex = gameState.players.findIndex(p => p.id === gameState.currentPlayer.id);
+                if (existingPlayerIndex === -1) {
+                    gameState.players.push(gameState.currentPlayer);
+                }
+            }
 
             document.getElementById('playerRegistration').classList.add('d-none');
             document.getElementById('playerWaiting').classList.remove('d-none');
@@ -779,14 +842,52 @@
         function openLobby() {
             document.getElementById('openLobbyBtn').classList.add('d-none');
             document.getElementById('lobbyOpen').classList.remove('d-none');
+            
+            // Initialize players list immediately
             updateHostPlayersList();
+            
+            // Start polling for players if in local mode
+            if (isLocalMode) {
+                startLocalModePolling();
+            }
+        }
+
+        function startLocalModePolling() {
+            // For demonstration purposes, add some sample players in local mode
+            setTimeout(() => {
+                if (isLocalMode && gameState.isHost) {
+                    // Add a sample player for testing
+                    const samplePlayer = {
+                        id: Date.now(),
+                        name: "Jogador Teste",
+                        school: "COTIL",
+                        city: "Limeira",
+                        score: 0,
+                        answeredQuestions: 0,
+                        finished: false
+                    };
+                    
+                    const existingPlayer = gameState.players.find(p => p.name === samplePlayer.name);
+                    if (!existingPlayer) {
+                        gameState.players.push(samplePlayer);
+                        updateHostPlayersList();
+                    }
+                }
+            }, 2000);
         }
 
         function updateHostPlayersList() {
             const playersList = document.getElementById('playersList');
+            const playerCount = document.getElementById('playerCount');
+            
+            // Clear the list
             playersList.innerHTML = '';
+            
+            // Update player count
+            playerCount.textContent = gameState.players.length;
 
-            gameState.players.forEach(player => {
+            // Add each player to the list
+            gameState.players.forEach((player, index) => {
                 const playerCard = document.createElement('div');
                 playerCard.className = 'card player-item mb-2';
                 playerCard.innerHTML = `
@@ -804,11 +905,19 @@
                 playersList.appendChild(playerCard);
             });
 
+            // Update start button state
             const startBtn = document.getElementById('startGameBtn');
             startBtn.disabled = gameState.players.length === 0;
+            
+            console.log(`Updated players list: ${gameState.players.length} players`);
         }
 
         function startGame() {
+            if (gameState.players.length === 0) {
+                alert('Aguarde pelo menos um jogador entrar na sala!');
+                return;
+            }
+
             gameState.gameStarted = true;
             document.getElementById('hostLobby').classList.add('d-none');
             document.getElementById('hostGame').classList.remove('d-none');
@@ -818,7 +927,21 @@
                 type: 'start_game'
             });
 
+            // Start game timer
+            startGameTimer();
             updateHostLeaderboard();
+        }
+
+        function startGameTimer() {
+            const timerInterval = setInterval(() => {
+                gameState.gameTimer--;
+                updateTimerDisplay();
+                
+                if (gameState.gameTimer <= 0) {
+                    clearInterval(timerInterval);
+                    endGame();
+                }
+            }, 1000);
         }
 
         function updateTimerDisplay() {
@@ -835,7 +958,7 @@
             leaderboard.innerHTML = '';
             sortedPlayers.forEach((player, index) => {
                 const playerCard = document.createElement('div');
-                playerCard.className = 'card leaderboard-item mb-3';
+                playerCard.className = 'leaderboard-item mb-3';
                 playerCard.innerHTML = `
                     <div class="card-body py-3">
                         <div class="row align-items-center">
@@ -867,7 +990,9 @@
 
         function endGameFromServer(finalResults) {
             gameState.gameEnded = true;
-            gameState.players = finalResults.players;
+            if (finalResults && finalResults.players) {
+                gameState.players = finalResults.players;
+            }
             
             // Show host results
             if (gameState.isHost) {
@@ -903,7 +1028,7 @@
             
             top3Players.forEach((player, index) => {
                 const playerCard = document.createElement('div');
-                playerCard.className = `card leaderboard-item mb-3 ${index === 0 ? 'top' : ''}`;
+                playerCard.className = `leaderboard-item mb-3 ${index === 0 ? 'top' : ''}`;
                 playerCard.innerHTML = `
                     <div class="card-body py-3">
                         <div class="row align-items-center">
@@ -942,7 +1067,7 @@
                 
                 sortedPlayers.forEach((player, index) => {
                     const playerCard = document.createElement('div');
-                    playerCard.className = `card leaderboard-item mb-2 ${player.id === gameState.currentPlayer.id ? 'top' : ''}`;
+                    playerCard.className = `leaderboard-item mb-2 ${player.id === gameState.currentPlayer.id ? 'top' : ''}`;
                     playerCard.innerHTML = `
                         <div class="card-body py-2">
                             <div class="row align-items-center">
@@ -993,7 +1118,10 @@
         }
 
         function updateRoomCode() {
-            // Add room code display to host UI if needed
+            if (gameState.roomCode) {
+                document.getElementById('roomCodeDisplay').classList.remove('d-none');
+                document.getElementById('roomCode').textContent = gameState.roomCode;
+            }
             console.log('Room code:', gameState.roomCode);
         }
 
