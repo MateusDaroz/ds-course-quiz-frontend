@@ -212,7 +212,7 @@
             font-size: clamp(2.5rem, 6vw, 5rem);
             font-weight: 900;
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             color: rgb(116, 82, 150) !important; /* Off-white for vintage CRT glow */
             text-shadow: 
                 0 0 10px rgba(102,51,153,0.8),
@@ -227,6 +227,21 @@
         @keyframes titlePulse {
             0% { transform: scale(1); opacity: 0.9; }
             100% { transform: scale(1.02); opacity: 1; }
+        }
+
+        .hacker-text {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            font-weight: bold;
+            color: rgb(116, 82, 150);
+            text-shadow: 0 0 10px rgb(116, 82, 150), 0 0 20px rgb(116, 82, 150), 0 0 30px rgb(116, 82, 150);
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+            min-height: 80px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: glow 2s ease-in-out infinite alternate;
         }
 
         .home-buttons {
@@ -613,12 +628,12 @@
                 <div class="tv-screen">
                     <div class="grid-overlay"></div>
                     <h1 class="home-title">DS QUIZ</h1>
+                    <div class="hacker-text" id="hackerText">
+                        Você será capaz de resolver todos os desafios do curso?
+                    </div>
                     <div class="home-buttons">
                         <button class="home-btn" onclick="startQuiz()">
                             <i class="bi bi-play-circle-fill me-2"></i>Começar
-                        </button>
-                        <button class="home-btn" onclick="showCredits()">
-                            <i class="bi bi-info-circle-fill me-2"></i>Créditos
                         </button>
                     </div>
                 </div>
@@ -646,6 +661,7 @@
                         <div class="card-body p-4 p-md-5">
                             
                             <!-- System Selection -->
+                             <!--
                             <div id="systemSelector" class="text-center">
                                 <div class="mb-4">
                                     <i class="bi bi-code-slash icon-lg mb-3"></i>
@@ -665,7 +681,7 @@
                                         <i class="bi bi-arrow-left me-2"></i>Voltar ao Início
                                     </button>
                                 </div>
-                            </div>
+                            </div>-->
 
                             <!-- Player System -->
                             <div id="playerSystem" class="d-none">
@@ -923,6 +939,7 @@
             setTimeout(() => {
                 homeScreen.style.display = 'none';
                 mainContent.classList.add('show');
+                initPlayer();
             }, 1500);
         }
 
@@ -1122,7 +1139,7 @@
 
         function initPlayer() {
             gameState.isHost = false;
-            document.getElementById('systemSelector').classList.add('d-none');
+            //document.getElementById('systemSelector').classList.add('d-none');
             document.getElementById('playerSystem').classList.remove('d-none');
         }
 
@@ -1539,6 +1556,159 @@
             }
             console.log('Room code:', gameState.roomCode);
         }
+
+        const originalText = "Você será capaz de resolver todos os desafios do curso?";
+        const hackerText = document.getElementById('hackerText');
+        
+        // Characters used for encryption effect
+        const encryptChars = ['!', '@', '#', '$', '%', '&', '*', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
+                            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 
+                            'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '€', '§', '±', '∞', '÷', '∑'];
+        
+        let isEncrypting = false;
+        let encryptionInterval;
+        let currentState = [];
+        let isDecrypting = false;
+        
+        // Initialize current state
+        function initializeState() {
+            currentState = originalText.split('').map((char, index) => ({
+                original: char,
+                current: char,
+                isEncrypted: false,
+                index: index
+            }));
+        }
+        
+        // Get random encryption character
+        function getRandomEncryptChar() {
+            return encryptChars[Math.floor(Math.random() * encryptChars.length)];
+        }
+        
+        // Update display
+        function updateDisplay() {
+            const displayText = currentState.map(charObj => {
+                if (charObj.isEncrypted) {
+                    return `<span class="encrypted-char">${charObj.current}</span>`;
+                }
+                return charObj.current;
+            }).join('');
+            
+            hackerText.innerHTML = displayText;
+        }
+        
+        // Encryption phase
+        function encryptStep() {
+            const charsToEncrypt = Math.floor(Math.random() * 5) + 1; // 1-5 characters
+            const availableIndices = currentState
+                .map((char, index) => ({ char, index }))
+                .filter(item => !item.char.isEncrypted && item.char.original !== ' ')
+                .map(item => item.index);
+            
+            if (availableIndices.length === 0) {
+                setTimeout(() => {
+                    isDecrypting = true;
+                    status.textContent = "Descriptografando...";
+                }, 1000);
+                return;
+            }
+            
+            for (let i = 0; i < Math.min(charsToEncrypt, availableIndices.length); i++) {
+                const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+                currentState[randomIndex].current = getRandomEncryptChar();
+                currentState[randomIndex].isEncrypted = true;
+                availableIndices.splice(availableIndices.indexOf(randomIndex), 1);
+            }
+            
+            updateDisplay();
+        }
+        
+        // Decryption phase
+        function decryptStep() {
+            const charsToDecrypt = Math.floor(Math.random() * 3) + 1; // 1-3 characters
+            const encryptedIndices = currentState
+                .map((char, index) => ({ char, index }))
+                .filter(item => item.char.isEncrypted)
+                .map(item => item.index);
+            
+            if (encryptedIndices.length === 0) {
+                setTimeout(() => {
+                    isDecrypting = false;
+                    status.textContent = "Criptografando...";
+                }, 3000); 
+                return;
+            }
+            
+            for (let i = 0; i < Math.min(charsToDecrypt, encryptedIndices.length); i++) {
+                const randomIndex = encryptedIndices[Math.floor(Math.random() * encryptedIndices.length)];
+                currentState[randomIndex].current = currentState[randomIndex].original;
+                currentState[randomIndex].isEncrypted = false;
+                encryptedIndices.splice(encryptedIndices.indexOf(randomIndex), 1);
+            }
+            
+            updateDisplay();
+        }
+        
+        // Main encryption loop
+        function encryptionLoop() {
+            if (!isEncrypting) return;
+            
+            // Add some random encrypted chars even during decryption for more chaos
+            if (Math.random() < 0.3) {
+                currentState.forEach(charObj => {
+                    if (charObj.isEncrypted && Math.random() < 0.5) {
+                        charObj.current = getRandomEncryptChar();
+                    }
+                });
+            }
+            
+            if (isDecrypting) {
+                decryptStep();
+            } else {
+                encryptStep();
+            }
+        }
+        
+        // Start encryption effect
+        function startEncryption() {
+            if (isEncrypting) return;
+            
+            isEncrypting = true;
+            isDecrypting = false;
+            status.textContent = "Criptografando...";
+            
+            initializeState();
+            
+            encryptionInterval = setInterval(encryptionLoop, 50); // Update every 100ms
+        }
+        
+        // Stop encryption effect
+        function stopEncryption() {
+            isEncrypting = false;
+            isDecrypting = false;
+            
+            if (encryptionInterval) {
+                clearInterval(encryptionInterval);
+            }
+            
+            status.textContent = "Sistema Pausado";
+        }
+        
+        // Reset to original text
+        function resetText() {
+            stopEncryption();
+            hackerText.innerHTML = originalText;
+            status.textContent = "Sistema Online";
+        }
+        
+        // Initialize
+        initializeState();
+        updateDisplay();
+        
+        // Auto-start after 2 seconds
+        setTimeout(() => {
+            startEncryption();
+        }, 2000);
 
         // Initialize WebSocket connection and set up responsive behavior
         window.addEventListener('load', function() {
