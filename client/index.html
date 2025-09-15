@@ -51,6 +51,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-direction: column;
             z-index: 2000;
             transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
@@ -125,6 +126,28 @@
             pointer-events: none;
         }
 
+        .tv-aerials{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: row;
+            margin-top: -3rem;
+        }
+        
+        .tv-aerial{
+            width: 10px; 
+            height: 100px; 
+            background-color: rgb(85, 85, 85); 
+        }
+
+        .tv-aerial.right{
+            transform: rotate(45deg) translateX(3rem);
+        }
+
+        .tv-aerial.left{
+            transform: rotate(135deg) translateX(3rem);    
+        }
+        
         .tv-controls {
             /*position: absolute;
             right: 10px;
@@ -634,6 +657,10 @@
 <body>
     <!-- Home Screen - Vintage TV -->
     <div id="homeScreen" class="home-screen">
+        <div class="tv-aerials">
+            <div class="tv-aerial left"></div>
+            <div class="tv-aerial right"></div>
+        </div>
         <div class="tv-frame">
             <div class="tv-bezel">
                 <div class="tv-screen">
