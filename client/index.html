@@ -472,7 +472,14 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        .leaderboard-item.top {
+        .leaderboard-item.purple {
+            background: var(--gradient-border);
+            border-color: #793cb6;
+            color: #32194b !important;
+            font-weight: bold;
+        }
+
+        .leaderboard-item.top{
             background: linear-gradient(145deg, #ffd700, #ffed4e);
             border-color: #ffc107;
             color: #856404 !important;
@@ -569,6 +576,10 @@
         .main-content.show {
             opacity: 1;
             transform: scale(1);
+        }
+
+        .bronze{
+            color: #653208 !important;
         }
 
         @media (max-width: 768px) {
@@ -1467,7 +1478,8 @@
                             <div class="col-2">
                                 ${index === 0 ? '<i class="bi bi-trophy-fill text-warning fs-3"></i>' : 
                                   index === 1 ? '<i class="bi bi-award-fill text-secondary fs-3"></i>' : 
-                                  '<i class="bi bi-award text-warning fs-3"></i>'}
+                                  index == 2 ? '<i class="bi bi-award-fill bronze fs-3"></i>' :
+                                  '<i class="bi bi-award text-tertiary fs-3"></i>'}
                             </div>
                             <div class="col-6">
                                 <strong>#${index + 1} ${player.name}</strong>
@@ -1499,7 +1511,7 @@
                 
                 sortedPlayers.forEach((player, index) => {
                     const playerCard = document.createElement('div');
-                    playerCard.className = `leaderboard-item mb-2 ${player.id === gameState.currentPlayer.id ? 'top' : ''}`;
+                    playerCard.className = `leaderboard-item mb-2 ${player.id === gameState.currentPlayer.id ? 'purple' : ''}`;
                     playerCard.innerHTML = `
                         <div class="card-body py-2">
                             <div class="row align-items-center">
@@ -1508,10 +1520,10 @@
                                 </div>
                                 <div class="col-6">
                                     <strong>${player.name}</strong>
-                                    ${player.id === gameState.currentPlayer.id ? '<i class="bi bi-person-fill text-warning ms-1"></i>' : ''}
+                                    ${player.id === gameState.currentPlayer.id ? '<i class="bi bi-person-fill text-secondary ms-1"></i>' : ''}
                                 </div>
                                 <div class="col-4 text-end">
-                                    <span class="badge badge-purple">${player.score} pontos</span>
+                                    <span class="badge bg-secondary">${player.score} pontos</span>
                                 </div>
                             </div>
                         </div>
