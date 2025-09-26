@@ -605,6 +605,12 @@
             color: #653208 !important;
         }
 
+        .completion-time {
+            font-size: 0.8rem;
+            color: #aaa;
+            font-style: italic;
+        }
+
         @media (max-width: 768px) {
             .alternatives-grid {
                 grid-template-columns: 1fr !important;
@@ -718,7 +724,7 @@
                         <div class="card-body p-4 p-md-5">
                             
                             <!-- System Selection -->
-                             <!--
+                            
                             <div id="systemSelector" class="text-center">
                                 <div class="mb-4">
                                     <i class="bi bi-code-slash icon-lg mb-3"></i>
@@ -738,7 +744,7 @@
                                         <i class="bi bi-arrow-left me-2"></i>Voltar ao Início
                                     </button>
                                 </div>
-                            </div>-->
+                            </div>
 
                             <!-- Player System -->
                             <div id="playerSystem" class="d-none">
@@ -814,6 +820,7 @@
                                         <i class="bi bi-check-circle icon-lg mb-3 text-success"></i>
                                         <h2 class="mb-4">Você completou o quiz!</h2>
                                         <div class="score mb-4" id="finalScore">Sua pontuação final: 0 pontos</div>
+                                        <div class="completion-time mb-4" id="playerCompletionTime">Tempo de conclusão: --</div>
                                         <div class="spinner-border text-light mb-3" role="status">
                                             <span class="visually-hidden">Loading...</span>
                                         </div>
@@ -827,6 +834,7 @@
                                         <i class="bi bi-award icon-lg mb-3"></i>
                                         <h2 class="mb-4">Resultados Finais</h2>
                                         <div class="score mb-2" id="playerFinalScore">Sua pontuação: 0 pontos</div>
+                                        <div class="completion-time mb-2" id="playerFinalTime">Tempo: --</div>
                                         <div class="score mb-4" id="playerPosition">Sua posição: #1</div>
                                     </div>
                                     <div class="custom-scrollbar" id="finalLeaderboard"></div>
@@ -982,6 +990,45 @@
             ]
         };
 
+        // Helper function to format time in MM:SS format
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // Helper function to calculate completion time in seconds
+        function calculateCompletionTime(player) {
+            if (!player.startTime || !player.endTime) return null;
+            return Math.round((player.endTime - player.startTime) / 1000);
+        }
+
+        // Enhanced sorting function with tiebreaker
+        function sortPlayersWithTiebreaker(players) {
+            return [...players].sort((a, b) => {
+                // First, sort by score (higher is better)
+                if (b.score !== a.score) {
+                    return b.score - a.score;
+                }
+                
+                // If scores are equal, sort by completion time (lower is better)
+                const timeA = calculateCompletionTime(a);
+                const timeB = calculateCompletionTime(b);
+                
+                // If both have completion times, compare them
+                if (timeA !== null && timeB !== null) {
+                    return timeA - timeB;
+                }
+                
+                // If only one has a completion time, prioritize the one who finished
+                if (timeA !== null && timeB === null) return -1;
+                if (timeA === null && timeB !== null) return 1;
+                
+                // If neither has completion time, maintain current order
+                return 0;
+            });
+        }
+
         // Home Screen Functions
         function startQuiz() {
             const homeScreen = document.getElementById('homeScreen');
@@ -996,7 +1043,6 @@
             setTimeout(() => {
                 homeScreen.style.display = 'none';
                 mainContent.classList.add('show');
-                initPlayer();
             }, 1500);
         }
 
@@ -1196,7 +1242,7 @@
 
         function initPlayer() {
             gameState.isHost = false;
-            //document.getElementById('systemSelector').classList.add('d-none');
+            document.getElementById('systemSelector').classList.add('d-none');
             document.getElementById('playerSystem').classList.remove('d-none');
         }
 
@@ -1212,13 +1258,15 @@
             }
 
             gameState.currentPlayer = {
-                id: Date.now() + Math.random(), // Ensure unique ID
+                id: new Date(Date.now()) + Math.random(), // Ensure unique ID
                 name: name,
                 school: school,
                 city: city,
                 score: 0,
                 answeredQuestions: 0,
-                finished: false
+                finished: false,
+                startTime: null, // Will be set when quiz starts
+                endTime: null    // Will be set when quiz ends
             };
 
             // Send join request to server
@@ -1241,6 +1289,9 @@
         }
 
         function startPlayerQuiz() {
+            // Record start time when quiz begins
+            gameState.currentPlayer.startTime = new Date(Date.now());
+            
             document.getElementById('playerWaiting').classList.add('d-none');
             document.getElementById('playerQuiz').classList.remove('d-none');
             showQuestion();
@@ -1314,17 +1365,38 @@
         }
 
         function finishPlayerQuiz() {
+            // Record end time when quiz finishes
+            gameState.currentPlayer.endTime = new Date(Date.now());
             gameState.currentPlayer.finished = true;
+            
+            // Calculate completion time
+            const completionTime = calculateCompletionTime(gameState.currentPlayer);
+            
             document.getElementById('playerQuiz').classList.add('d-none');
             document.getElementById('playerWaitingResults').classList.remove('d-none');
             document.getElementById('finalScore').textContent = `Sua pontuação final: ${gameState.currentPlayer.score} pontos`;
+            
+            // Display completion time
+            if (completionTime !== null) {
+                document.getElementById('playerCompletionTime').textContent = `Tempo de conclusão: ${formatTime(completionTime)}`;
+            }
 
             // Notify server that player finished
             sendWebSocketMessage({
                 type: 'player_finished',
                 playerId: gameState.currentPlayer.id,
-                finalScore: gameState.currentPlayer.score
+                finalScore: gameState.currentPlayer.score,
+                completionTime: completionTime
             });
+
+            // Update local player list if in local mode
+            if (isLocalMode) {
+                const playerIndex = gameState.players.findIndex(p => p.id === gameState.currentPlayer.id);
+                if (playerIndex !== -1) {
+                    gameState.players[playerIndex] = {...gameState.currentPlayer};
+                }
+                checkAllPlayersFinished();
+            }
         }
 
         // Host Functions
@@ -1347,13 +1419,15 @@
                 if (isLocalMode && gameState.isHost) {
                     // Add a sample player for testing
                     const samplePlayer = {
-                        id: Date.now(),
+                        id: new Date(Date.now()),
                         name: "Jogador Teste",
                         school: "COTIL",
                         city: "Limeira",
                         score: 0,
                         answeredQuestions: 0,
-                        finished: false
+                        finished: false,
+                        startTime: null,
+                        endTime: null
                     };
                     
                     const existingPlayer = gameState.players.find(p => p.name === samplePlayer.name);
@@ -1408,6 +1482,14 @@
             }
 
             gameState.gameStarted = true;
+            
+            // Set start time for all players
+            const startTime = Date.now();
+            console.log(startTime);
+            gameState.players.forEach(player => {
+                player.startTime = startTime;
+            });
+
             document.getElementById('hostLobby').classList.add('d-none');
             document.getElementById('hostGame').classList.remove('d-none');
 
@@ -1442,10 +1524,14 @@
 
         function updateHostLeaderboard() {
             const leaderboard = document.getElementById('liveLeaderboard');
-            const sortedPlayers = [...gameState.players].sort((a, b) => b.score - a.score);
+            const sortedPlayers = sortPlayersWithTiebreaker(gameState.players);
             
             leaderboard.innerHTML = '';
             sortedPlayers.forEach((player, index) => {
+                const completionTime = calculateCompletionTime(player);
+                const timeDisplay = completionTime ? formatTime(completionTime) : '--';
+                const statusIcon = player.finished ? '<i class="bi bi-check-circle-fill text-success ms-1"></i>' : '';
+                
                 const playerCard = document.createElement('div');
                 playerCard.className = 'leaderboard-item mb-3';
                 playerCard.innerHTML = `
@@ -1454,12 +1540,15 @@
                             <div class="col-1">
                                 <span class="badge bg-secondary fs-6">#${index + 1}</span>
                             </div>
-                            <div class="col-7">
-                                <strong>${player.name}</strong>
+                            <div class="col-5">
+                                <strong>${player.name}${statusIcon}</strong>
                                 <br><small>${player.school}</small>
                             </div>
-                            <div class="col-4 text-end">
+                            <div class="col-3 text-end">
                                 <span class="badge badge-purple fs-6">${player.score} pontos</span>
+                            </div>
+                            <div class="col-3 text-end">
+                                <small class="completion-time">Tempo: ${timeDisplay}</small>
                             </div>
                         </div>
                     </div>
@@ -1508,14 +1597,15 @@
             document.getElementById('hostGame').classList.add('d-none');
             document.getElementById('hostResults').classList.remove('d-none');
             
-            const top3Players = [...gameState.players]
-                .sort((a, b) => b.score - a.score)
-                .slice(0, 3);
+            const top3Players = sortPlayersWithTiebreaker(gameState.players).slice(0, 3);
             
             const top3Leaderboard = document.getElementById('top3Leaderboard');
             top3Leaderboard.innerHTML = '';
             
             top3Players.forEach((player, index) => {
+                const completionTime = calculateCompletionTime(player);
+                const timeDisplay = completionTime ? formatTime(completionTime) : '--';
+                
                 const playerCard = document.createElement('div');
                 playerCard.className = `leaderboard-item mb-3 ${index === 0 ? 'top' : ''}`;
                 playerCard.innerHTML = `
@@ -1527,12 +1617,15 @@
                                   index == 2 ? '<i class="bi bi-award-fill bronze fs-3"></i>' :
                                   '<i class="bi bi-award text-tertiary fs-3"></i>'}
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <strong>#${index + 1} ${player.name}</strong>
                                 <br><small>${player.school}</small>
                             </div>
-                            <div class="col-4 text-end">
+                            <div class="col-3 text-end">
                                 <span class="badge badge-purple fs-5">${player.score} pontos</span>
+                            </div>
+                            <div class="col-3 text-end">
+                                <small class="completion-time">Tempo: ${timeDisplay}</small>
                             </div>
                         </div>
                     </div>
@@ -1546,30 +1639,42 @@
                 document.getElementById('playerWaitingResults').classList.add('d-none');
                 document.getElementById('playerResults').classList.remove('d-none');
                 
-                const sortedPlayers = [...gameState.players].sort((a, b) => b.score - a.score);
+                const sortedPlayers = sortPlayersWithTiebreaker(gameState.players);
                 const playerPosition = sortedPlayers.findIndex(p => p.id === gameState.currentPlayer.id) + 1;
+                const completionTime = calculateCompletionTime(gameState.currentPlayer);
                 
                 document.getElementById('playerFinalScore').textContent = `Sua pontuação: ${gameState.currentPlayer.score} pontos`;
                 document.getElementById('playerPosition').textContent = `Sua posição: #${playerPosition}`;
+                
+                // Display completion time
+                if (completionTime !== null) {
+                    document.getElementById('playerFinalTime').textContent = `Tempo: ${formatTime(completionTime)}`;
+                }
                 
                 const finalLeaderboard = document.getElementById('finalLeaderboard');
                 finalLeaderboard.innerHTML = '';
                 
                 sortedPlayers.forEach((player, index) => {
+                    const playerCompletionTime = calculateCompletionTime(player);
+                    const timeDisplay = playerCompletionTime ? formatTime(playerCompletionTime) : '--';
+                    
                     const playerCard = document.createElement('div');
                     playerCard.className = `leaderboard-item mb-2 ${player.id === gameState.currentPlayer.id ? 'purple' : ''}`;
                     playerCard.innerHTML = `
                         <div class="card-body py-2">
                             <div class="row align-items-center">
-                                <div class="col-2">
+                                <div class="col-1">
                                     <span class="badge bg-secondary">#${index + 1}</span>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-5">
                                     <strong>${player.name}</strong>
                                     ${player.id === gameState.currentPlayer.id ? '<i class="bi bi-person-fill ms-1"></i>' : ''}
                                 </div>
-                                <div class="col-4 text-end">
+                                <div class="col-3 text-end">
                                     <span class="badge bg-secondary">${player.score} pontos</span>
+                                </div>
+                                <div class="col-3 text-end">
+                                    <small class="completion-time">${timeDisplay}</small>
                                 </div>
                             </div>
                         </div>
@@ -1619,7 +1724,7 @@
         const hackerText = document.getElementById('hackerText');
         
         // Characters used for encryption effect
-        const encryptChars = ['!', '@', '#', '$', '%', '&', '*', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
+        const encryptChars = ['!', '@', '#', '%', '&', '*', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
                             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 
                             'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '€', '§', '±', '∞', '÷', '∑'];
         
