@@ -718,7 +718,7 @@
                         <div class="card-body p-4 p-md-5">
                             
                             <!-- System Selection -->
-                            
+                             <!--
                             <div id="systemSelector" class="text-center">
                                 <div class="mb-4">
                                     <i class="bi bi-code-slash icon-lg mb-3"></i>
@@ -738,7 +738,7 @@
                                         <i class="bi bi-arrow-left me-2"></i>Voltar ao Início
                                     </button>
                                 </div>
-                            </div>
+                            </div>-->
 
                             <!-- Player System -->
                             <div id="playerSystem" class="d-none">
@@ -996,6 +996,7 @@
             setTimeout(() => {
                 homeScreen.style.display = 'none';
                 mainContent.classList.add('show');
+                initPlayer();
             }, 1500);
         }
 
@@ -1195,7 +1196,7 @@
 
         function initPlayer() {
             gameState.isHost = false;
-            document.getElementById('systemSelector').classList.add('d-none');
+            //document.getElementById('systemSelector').classList.add('d-none');
             document.getElementById('playerSystem').classList.remove('d-none');
         }
 
